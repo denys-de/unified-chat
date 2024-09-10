@@ -17,6 +17,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.PermitAll;
 import reactor.core.Disposable;
 
 /**
@@ -24,6 +25,7 @@ import reactor.core.Disposable;
  */
 
 @Route(value = "channel", layout = MainLayout.class)
+@PermitAll
 public class ChannelView extends VerticalLayout
         implements HasUrlParameter<String>, HasDynamicTitle {
 
@@ -80,12 +82,11 @@ public class ChannelView extends VerticalLayout
     }
 
     private MessageListItem createMessageListItem(Message message) {
-        var item = new MessageListItem(
+        return new MessageListItem(
                 message.message(),
                 message.timestamp(),
                 message.author()
         );
-        return item;
     }
 
     private void receiveMessages(List<Message> incoming) {

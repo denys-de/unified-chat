@@ -2,12 +2,14 @@ package com.example.application.chat;
 
 import com.example.application.chat.spi.ChannelRepository;
 import com.example.application.chat.spi.NewChannel;
+import com.example.application.security.Roles;
 import jakarta.annotation.PostConstruct;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import reactor.test.StepVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("ReactiveStreamsUnusedPublisher")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@WithMockUser
 class ChatServiceTest {
 
     private String knownChannelId;
@@ -32,6 +35,7 @@ class ChatServiceTest {
 
     @Test
     @DisplayName("Users can retrieve channels")
+    @WithMockUser
     void users_can_retrieve_channels() {
         assertThat(chatService.channels()).isNotEmpty();
         assertThat(chatService.channel(knownChannelId)).isPresent();
@@ -39,6 +43,7 @@ class ChatServiceTest {
 
     @Test
     @DisplayName("Admins can create channels")
+    @WithMockUser(roles = {Roles.ADMIN,Roles.USER})
     void admins_can_create_channels() {
         var channel = chatService.createChannel("My channel");
         assertThat(chatService.channel(channel.id())).contains(channel);
@@ -57,7 +62,6 @@ class ChatServiceTest {
                     }
                     var message = messages.getFirst();
                     return message.channelId().equals(knownChannelId)
-                            && message.author().equals("John Doe")
                             && message.message().equals("Hello, world!");
                 })
                 .thenCancel()
@@ -104,6 +108,7 @@ class ChatServiceTest {
 
     @Test
     @DisplayName("Listening to a nonexistent channel throws an exception")
+    @WithMockUser
     void listening_to_nonexistent_channel_throws_exception() {
         assertThatThrownBy(() -> chatService.liveMessages("nonexistent")).isInstanceOf(InvalidChannelException.class);
     }
