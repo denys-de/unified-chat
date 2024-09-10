@@ -1,0 +1,23 @@
+logging:
+    level:
+        org:
+            atmosphere: warn
+server:
+    port: ${PORT:8080}
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        password: adminpass
+        url: jdbc:postgresql://localhost:5432/mydb
+        username: admin
+    jpa:
+        open-in-view: false
+        show-sql: true
+    liquibase:
+        change-log: classpath:db/changelog/db.changelog-master.xml
+        enabled: true
+    mustache:
+        check-template-location: false
+vaadin:
+    launch-browser: true
+    whitelisted-packages: com.vaadin,com.example.application
